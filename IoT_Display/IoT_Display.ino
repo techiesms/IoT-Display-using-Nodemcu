@@ -18,7 +18,7 @@
 ESP8266WiFiMulti WiFiMulti;
 
 #include <PxMatrix.h>  //https://github.com/2dom/PxMatrix
-#include <Ticker.h>  
+#include <Ticker.h>
 #include "InstagramStats.h" //https://github.com/witnessmenow/arduino-instagram-stats
 #include "JsonStreamingParser.h" //https://github.com/squix78/json-streaming-parser
 
@@ -29,7 +29,7 @@ ESP8266WiFiMulti WiFiMulti;
 WiFiClientSecure secureClient;
 
 InstagramStats instaStats(secureClient);
-String userName = "Your_Instagram_Username";
+String userName = "Instagram_username";
 
 //int previous_count;
 int current_count;
@@ -296,7 +296,7 @@ void loop() {
            FETCHING INSTAGRAM FOLLOWERS
   ***************************************************************************/
   getInstagramStatsForUser();
-
+Request_1:
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
     HTTPClient http;
@@ -365,7 +365,7 @@ void loop() {
     } else {
       if (DEBUG)Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
       delay(1000);
-      while (1);
+      goto Request_1;
     }
     http.end();
 
@@ -409,9 +409,10 @@ void loop() {
     /***************************************************************************
          FOR CURRENT WEATHER
        ***************************************************************************/
-
-    if ((WiFiMulti.run() == WL_CONNECTED)) {
+Request_2:
+    {
       HTTPClient http;
+      if (DEBUG)Serial.print("[HTTP] begin...\n");
 
       http.begin("http://api.thingspeak.com/apps/thinghttp/send_request?api_key=W6PLXP5564JOY72X"); //HTTP
       // start connection and send HTTP header
@@ -425,7 +426,7 @@ void loop() {
         if (httpCode == HTTP_CODE_OK) {
 
           String payload = http.getString();
-          //if(DEBUG)Serial.println(payload);
+          if (DEBUG)Serial.println(payload);
 
 
           char* temp = &payload[0];
@@ -470,6 +471,7 @@ void loop() {
         }
       } else {
         if (DEBUG)Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+        goto Request_2;
       }
 
       http.end();
@@ -506,8 +508,8 @@ void loop() {
     /***************************************************************************
              FOR WEATHER FORECAST
     ***************************************************************************/
-
-    if ((WiFiMulti.run() == WL_CONNECTED)) {
+Request_3:
+    {
 
       HTTPClient http;
       if (DEBUG)Serial.print("[HTTP] begin...\n");
@@ -524,7 +526,7 @@ void loop() {
         // file found at server
         if (httpCode == HTTP_CODE_OK) {
           String payload = http.getString();
-          //if(DEBUG)Serial.println(payload);
+          if (DEBUG)Serial.println(payload);
 
 
           char* temp = &payload[0];
@@ -607,6 +609,7 @@ void loop() {
         }
       } else {
         if (DEBUG)Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+        goto Request_3;
       }
 
       http.end();
