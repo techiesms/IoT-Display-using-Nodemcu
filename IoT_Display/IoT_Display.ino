@@ -45,6 +45,7 @@ String Forecast_Day;
 String MaxMin;
 String Forecast_temperature;
 String rain;
+int previous_value;
 /********/
 #define double_buffer
 
@@ -190,6 +191,12 @@ void getInstagramStatsForUser() {
   if (DEBUG)Serial.print("Number of followers: ");
   if (DEBUG)Serial.println(response.followedByCount);
   current_count = response.followedByCount;
+   if (current_count == 0)
+  {
+    current_count = previous_value;
+  }
+  else
+    previous_value = current_count;
 }
 
 /***************************************************************************/
